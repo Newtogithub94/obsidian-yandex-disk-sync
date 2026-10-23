@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Cloud & Lightning Animation Test</title>
+<style>
+  body {
+    background: #1e1e2e;
+    color: #cdd6f4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+    font-family: system-ui, sans-serif;
+  }
+  .controls {
+    margin-top: 30px;
+    display: flex;
+    gap: 15px;
+  }
+  button {
+    background: #313244;
+    color: #cdd6f4;
+    border: 1px solid #45475a;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  button:hover {
+    background: #45475a;
+  }
+
+  /* ICON CONTAINER */
+  .icon-wrapper {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .yd-weather-icon {
+    width: 100px;
+    height: 100px;
+    overflow: visible;
+  }
+
+  /* 1. CLOUD BASE */
+  .yd-cloud {
+    fill: rgba(140, 160, 255, 0.12);
+    stroke: currentColor;
+    stroke-width: 5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: all 0.4s ease;
+    transform-origin: 50px 45px;
+  }
+
+  /* 2. LIGHTNING BOLT */
+  .yd-lightning {
+    fill: none;
+    stroke: #ffdd44;
+    stroke-width: 5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 120;
+    stroke-dashoffset: 120;
+    opacity: 0;
+    filter: drop-shadow(0 0 6px #ffdd44) drop-shadow(0 0 12px #ffaa00);
+    transition: opacity 0.2s ease;
+  }
+
+  .yd-lightning-branch {
+    fill: none;
+    stroke: #ffe066;
+    stroke-width: 3.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 40;
+    stroke-dashoffset: 40;
+    opacity: 0;
+    filter: drop-shadow(0 0 4px #ffdd44);
+  }
+
+  /* 3. DISSIPATION AURA / SHOCKWAVE */
+  .yd-dissipation-ring {
+    fill: none;
+    stroke: #80e5ff;
+    stroke-width: 3;
+    opacity: 0;
+    transform-origin: 50px 50px;
+    pointer-events: none;
+  }
+
+  /* --- ANIMATION: SYNCING (Lightning propagates downward) --- */
+  .yd-sync-striking .yd-cloud {
+    stroke: #a5b4fc;
+    fill: rgba(165, 180, 252, 0.25);
+    animation: yd-cloud-rumble 0.6s infinite alternate ease-in-out;
+  }
+
+  @keyframes yd-cloud-rumble {
+    0% { transform: translate(0, 0) scale(1); filter: drop-shadow(0 0 2px rgba(165, 180, 252, 0.4)); }
+    50% { transform: translate(-1px, 1px) scale(1.02); filter: drop-shadow(0 0 8px rgba(165, 180, 252, 0.7)); }
+    100% { transform: translate(1px, -0.5px) scale(0.99); filter: drop-shadow(0 0 4px rgba(165, 180, 252, 0.5)); }
+  }
+
+  .yd-sync-striking .yd-lightning {
+    opacity: 1;
+    animation: yd-lightning-strike 1.1s infinite cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .yd-sync-striking .yd-lightning-branch {
+    opacity: 1;
+    animation: yd-branch-strike 1.1s infinite cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  @keyframes yd-lightning-strike {
+    0% {
+      stroke-dashoffset: 120;
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    35% {
+      stroke-dashoffset: 0;
+      opacity: 1;
+      filter: drop-shadow(0 0 10px #ffffff) drop-shadow(0 0 18px #ffdd44);
+    }
+    55% {
+      opacity: 1;
+    }
+    75% {
+      opacity: 0.2;
+    }
+    85%, 100% {
+      stroke-dashoffset: 0;
+      opacity: 0;
+    }
+  }
+
+  @keyframes yd-branch-strike {
+    0%, 20% {
+      stroke-dashoffset: 40;
+      opacity: 0;
+    }
+    30% {
+      opacity: 1;
+    }
+    45% {
+      stroke-dashoffset: 0;
+      opacity: 1;
+    }
+    70% {
+      opacity: 0.3;
+    }
+    85%, 100% {
+      stroke-dashoffset: 0;
+      opacity: 0;
+    }
+  }
+
+  /* --- ANIMATION: SUCCESS (Pulse & Dissipate outwards) --- */
+  .yd-sync-success-fx .yd-cloud {
+    animation: yd-cloud-dissipate 1.4s ease-out forwards;
+  }
+
+  @keyframes yd-cloud-dissipate {
+    0% {
+      transform: scale(1);
+      stroke: #a5b4fc;
+      filter: drop-shadow(0 0 0px transparent);
+    }
+    25% {
+      transform: scale(1.18);
+      stroke: #4ade80;
+      fill: rgba(74, 222, 128, 0.3);
+      filter: drop-shadow(0 0 12px #4ade80);
+    }
+    55% {
+      transform: scale(1.3);
+      stroke: #86efac;
+      fill: rgba(74, 222, 128, 0.1);
+      opacity: 0.3;
+      filter: drop-shadow(0 0 20px #86efac) blur(1px);
+    }
+    80% {
+      transform: scale(1.38);
+      opacity: 0;
+      filter: blur(3px);
+    }
+    81% {
+      transform: scale(0.8);
+      opacity: 0;
+    }
+    100% {
+      transform: scale(1);
+      stroke: currentColor;
+      fill: rgba(140, 160, 255, 0.12);
+      opacity: 1;
+      filter: none;
+    }
+  }
+
+  .yd-sync-success-fx .yd-lightning {
+    animation: yd-lightning-flash-dissipate 1.4s ease-out forwards;
+  }
+
+  @keyframes yd-lightning-flash-dissipate {
+    0% {
+      stroke-dashoffset: 0;
+      opacity: 1;
+      stroke: #ffffff;
+      filter: drop-shadow(0 0 15px #ffffff) drop-shadow(0 0 25px #4ade80);
+    }
+    30% {
+      opacity: 1;
+      transform: scale(1.15) translateY(2px);
+      stroke: #4ade80;
+      filter: drop-shadow(0 0 18px #4ade80);
+    }
+    60% {
+      opacity: 0.2;
+      transform: scale(1.3) translateY(5px);
+      filter: blur(2px);
+    }
+    75%, 100% {
+      opacity: 0;
+      stroke-dashoffset: 120;
+      transform: scale(1);
+    }
+  }
+
+  .yd-sync-success-fx .yd-dissipation-ring {
+    animation: yd-shockwave-expand 1.2s cubic-bezier(0.1, 0.7, 0.2, 1) forwards;
+  }
+
+  @keyframes yd-shockwave-expand {
+    0% {
+      transform: scale(0.6);
+      opacity: 1;
+      stroke: #4ade80;
+      stroke-width: 4;
+      filter: drop-shadow(0 0 8px #4ade80);
+    }
+    50% {
+      opacity: 0.8;
+      stroke: #86efac;
+      stroke-width: 3;
+    }
+    100% {
+      transform: scale(2.4);
+      opacity: 0;
+      stroke-width: 0.5;
+      filter: blur(2px);
+    }
+  }
+</style>
+</head>
+<body>
+
+  <div class="icon-wrapper" id="iconWrapper">
+    <svg class="yd-weather-icon" viewBox="0 0 100 100">
+      <!-- Dissipation Shockwave Ring -->
+      <circle class="yd-dissipation-ring" cx="50" cy="45" r="28" />
+      
+      <!-- Cloud Body -->
+      <path class="yd-cloud" d="M 26 62 C 16 62 13 51 20 42 C 17 31 28 22 38 26 C 44 14 62 14 68 25 C 77 20 87 29 84 40 C 91 48 87 62 74 62 Z" />
+      
+      <!-- Realistic Forked Lightning -->
+      <!-- Branch -->
+      <path class="yd-lightning-branch" d="M 47 48 L 34 60" />
+      <!-- Main Strike through cloud to bottom -->
+      <path class="yd-lightning" d="M 52 14 L 45 36 L 59 39 L 43 62 L 55 64 L 38 90" />
+    </svg>
+  </div>
+
+  <div class="controls">
+    <button onclick="setMode('idle')">Обычный (Idle)</button>
+    <button onclick="setMode('sync')">Синхронизация (Молния)</button>
+    <button onclick="setMode('success')">Успех (Пульс и рассеивание)</button>
+  </div>
+
+  <script>
+    const el = document.getElementById('iconWrapper');
+    function setMode(mode) {
+      el.classList.remove('yd-sync-striking', 'yd-sync-success-fx');
+      if (mode === 'sync') {
+        el.classList.add('yd-sync-striking');
+      } else if (mode === 'success') {
+        el.classList.add('yd-sync-success-fx');
+        setTimeout(() => el.classList.remove('yd-sync-success-fx'), 1400);
+      }
+    }
+  </script>
+</body>
+</html>

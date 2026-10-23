@@ -1,0 +1,10 @@
+{
+  "id": "yandex-disk-sync",
+  "name": "Yandex Disk Sync",
+  "version": "1.0.0",
+  "minAppVersion": "1.4.0",
+  "description": "Bidirectional vault synchronization with Yandex Disk for Windows and Android with zero data loss.",
+  "author": "Yandex Disk Sync Contributors",
+  "authorUrl": "https://github.com",
+  "isDesktopOnly": false
+}

@@ -1,0 +1,608 @@
+/* Obsidian Yandex Disk Sync Plugin Styles */
+
+/* Status bar items */
+.yd-sync-status-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+}
+
+.yd-sync-status-bar:hover {
+  color: var(--text-normal);
+}
+
+.yd-sync-status-idle {
+  color: var(--text-muted);
+}
+
+.yd-sync-status-syncing {
+  color: var(--interactive-accent);
+}
+
+.yd-sync-status-synced {
+  color: var(--text-success, #68b723);
+}
+
+.yd-sync-status-conflict {
+  color: var(--text-warning, #e6a23c);
+}
+
+.yd-sync-status-error {
+  color: var(--text-error, #e53935);
+}
+
+/* =========================================================================
+   Cloud & Lightning Thunderstorm Sync Animation
+   1. Idle: Peaceful Cloud (adaptive currentColor)
+   2. Syncing: Cloud rumbles, realistic jagged lightning strikes downwards
+   3. Success: Pulse & Radial shockwave dissipation outwards
+   4. Error: Red flash and horizontal shake
+   ========================================================================= */
+
+.yd-sync-weather-icon {
+  overflow: visible !important;
+}
+
+.clickable-icon.yd-sync-striking,
+.clickable-icon.yd-sync-success-fx,
+.clickable-icon.yd-sync-error-fx {
+  overflow: visible !important;
+}
+
+/* 1. CLOUD BASE */
+.yd-cloud {
+  fill: rgba(140, 160, 255, 0.12);
+  stroke: currentColor;
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transform-origin: 50px 45px;
+  transition: stroke 0.3s ease, fill 0.3s ease;
+}
+
+/* 2. REALISTIC FORKED LIGHTNING */
+.yd-lightning {
+  fill: none;
+  stroke: #facc15;
+  stroke-width: 5.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 125;
+  stroke-dashoffset: 125;
+  opacity: 0;
+  filter: drop-shadow(0 0 4px #facc15) drop-shadow(0 0 10px #eab308);
+  transition: opacity 0.15s ease;
+}
+
+.yd-lightning-branch {
+  fill: none;
+  stroke: #fef08a;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 35;
+  stroke-dashoffset: 35;
+  opacity: 0;
+  filter: drop-shadow(0 0 3px #facc15);
+}
+
+/* 3. DISSIPATION SHOCKWAVE RING */
+.yd-dissipation-ring {
+  fill: none;
+  stroke: #4ade80;
+  stroke-width: 3.5;
+  opacity: 0;
+  transform-origin: 50px 45px;
+  pointer-events: none;
+}
+
+/* --- STATE 1: SYNCING (Lightning propagates downward) --- */
+.yd-sync-striking .yd-cloud {
+  stroke: var(--interactive-accent, #818cf8);
+  fill: rgba(129, 140, 248, 0.22);
+  animation: yd-cloud-rumble 0.6s infinite alternate ease-in-out;
+}
+
+@keyframes yd-cloud-rumble {
+  0% { transform: translate(0, 0) scale(1); filter: drop-shadow(0 0 2px rgba(129, 140, 248, 0.4)); }
+  50% { transform: translate(-1px, 1px) scale(1.03); filter: drop-shadow(0 0 7px rgba(129, 140, 248, 0.7)); }
+  100% { transform: translate(1px, -0.5px) scale(0.98); filter: drop-shadow(0 0 3px rgba(129, 140, 248, 0.5)); }
+}
+
+.yd-sync-striking .yd-lightning {
+  opacity: 1;
+  animation: yd-lightning-strike 1.1s infinite cubic-bezier(0.15, 0.85, 0.25, 1);
+}
+
+.yd-sync-striking .yd-lightning-branch {
+  opacity: 1;
+  animation: yd-branch-strike 1.1s infinite cubic-bezier(0.15, 0.85, 0.25, 1);
+}
+
+@keyframes yd-lightning-strike {
+  0% {
+    stroke-dashoffset: 125;
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  38% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+    filter: drop-shadow(0 0 8px #ffffff) drop-shadow(0 0 16px #facc15);
+  }
+  58% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 0.25;
+  }
+  88%, 100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+}
+
+@keyframes yd-branch-strike {
+  0%, 18% {
+    stroke-dashoffset: 35;
+    opacity: 0;
+  }
+  28% {
+    opacity: 1;
+  }
+  45% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.3;
+  }
+  88%, 100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+}
+
+/* --- STATE 2: SUCCESS (Pulse & Radial Dissipation Outwards) --- */
+.yd-sync-success-fx .yd-cloud {
+  animation: yd-cloud-dissipate 1.4s ease-out forwards;
+}
+
+@keyframes yd-cloud-dissipate {
+  0% {
+    transform: scale(1);
+    stroke: var(--interactive-accent, #818cf8);
+    filter: none;
+  }
+  25% {
+    transform: scale(1.18);
+    stroke: var(--text-success, #4ade80);
+    fill: rgba(74, 222, 128, 0.35);
+    filter: drop-shadow(0 0 12px #4ade80);
+  }
+  55% {
+    transform: scale(1.32);
+    stroke: var(--text-success, #86efac);
+    fill: rgba(74, 222, 128, 0.12);
+    opacity: 0.35;
+    filter: drop-shadow(0 0 20px #86efac) blur(1px);
+  }
+  78% {
+    transform: scale(1.42);
+    opacity: 0;
+    filter: blur(3px);
+  }
+  80% {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    stroke: currentColor;
+    fill: rgba(140, 160, 255, 0.12);
+    opacity: 1;
+    filter: none;
+  }
+}
+
+.yd-sync-success-fx .yd-lightning {
+  animation: yd-lightning-flash-dissipate 1.4s ease-out forwards;
+}
+
+@keyframes yd-lightning-flash-dissipate {
+  0% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+    stroke: #ffffff;
+    filter: drop-shadow(0 0 12px #ffffff) drop-shadow(0 0 22px #4ade80);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1.15) translateY(2px);
+    stroke: #4ade80;
+    filter: drop-shadow(0 0 16px #4ade80);
+  }
+  60% {
+    opacity: 0.2;
+    transform: scale(1.28) translateY(5px);
+    filter: blur(2px);
+  }
+  75%, 100% {
+    opacity: 0;
+    stroke-dashoffset: 125;
+    transform: scale(1);
+  }
+}
+
+.yd-sync-success-fx .yd-dissipation-ring {
+  animation: yd-shockwave-expand 1.2s cubic-bezier(0.1, 0.7, 0.2, 1) forwards;
+}
+
+@keyframes yd-shockwave-expand {
+  0% {
+    transform: scale(0.6);
+    opacity: 1;
+    stroke: var(--text-success, #4ade80);
+    stroke-width: 4;
+    filter: drop-shadow(0 0 8px #4ade80);
+  }
+  50% {
+    opacity: 0.8;
+    stroke: #86efac;
+    stroke-width: 3;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+    stroke-width: 0.5;
+    filter: blur(2px);
+  }
+}
+
+/* --- STATE 3: ERROR (Shake & Red warning glow) --- */
+@keyframes yd-cloud-error-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-3px); }
+  40%, 80% { transform: translateX(3px); }
+}
+
+.yd-sync-error-fx .yd-cloud {
+  animation: yd-cloud-error-shake 0.5s ease-in-out;
+  stroke: var(--text-error, #e53935) !important;
+  fill: rgba(229, 57, 53, 0.2) !important;
+  filter: drop-shadow(0 0 8px rgba(229, 57, 53, 0.6)) !important;
+}
+
+/* Backward compatibility classes */
+@keyframes yd-sync-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.yd-sync-spinning svg {
+  transform-origin: center center;
+  animation: yd-sync-spin 0.8s linear infinite !important;
+  color: var(--interactive-accent, #7c3aed) !important;
+}
+
+@keyframes yd-sync-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.25); color: var(--text-success, #68b723) !important; }
+  100% { transform: scale(1); color: var(--text-success, #68b723) !important; }
+}
+
+.yd-sync-success svg {
+  transform-origin: center center;
+  animation: yd-sync-pulse 0.8s ease-in-out !important;
+  color: var(--text-success, #68b723) !important;
+}
+
+/* Settings tab styles */
+.yd-sync-settings-section {
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  color: var(--text-normal);
+  border-bottom: 1px solid var(--background-modifier-border);
+  padding-bottom: 0.25rem;
+}
+
+.yd-sync-help-text {
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.yd-sync-warning-banner {
+  background-color: var(--background-modifier-error-hover, rgba(229, 57, 53, 0.15));
+  border-left: 4px solid var(--text-error, #e53935);
+  padding: 8px 12px;
+  margin: 12px 0;
+  border-radius: 4px;
+  font-size: var(--font-ui-small);
+  color: var(--text-normal);
+}
+
+.yd-sync-info-banner {
+  background-color: var(--background-secondary);
+  border-left: 4px solid var(--interactive-accent);
+  padding: 8px 12px;
+  margin: 12px 0;
+  border-radius: 4px;
+  font-size: var(--font-ui-small);
+  color: var(--text-normal);
+}
+
+/* =========================================================================
+   Interactive Sync Review Modal
+   ========================================================================= */
+
+.yd-review-modal-container {
+  padding: 10px 4px;
+}
+
+.yd-review-header h2 {
+  margin-top: 0;
+  margin-bottom: 6px;
+  font-size: 1.25rem;
+}
+
+.yd-review-subtext {
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+  margin-bottom: 14px;
+  line-height: 1.4;
+}
+
+.yd-review-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.yd-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: var(--font-ui-smaller);
+  font-weight: 500;
+}
+
+.yd-badge-upload {
+  background-color: rgba(74, 222, 128, 0.15);
+  color: var(--text-success, #4ade80);
+  border: 1px solid rgba(74, 222, 128, 0.3);
+}
+
+.yd-badge-download {
+  background-color: rgba(99, 102, 241, 0.15);
+  color: var(--interactive-accent, #818cf8);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.yd-badge-delete {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: var(--text-error, #f87171);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.yd-badge-conflict {
+  background-color: rgba(245, 158, 11, 0.15);
+  color: var(--text-warning, #fbbf24);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.yd-badge-converge,
+.yd-badge-default {
+  background-color: var(--background-modifier-hover);
+  color: var(--text-muted);
+}
+
+.yd-review-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.yd-review-count-info {
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.yd-review-btn-group {
+  display: flex;
+  gap: 8px;
+}
+
+.yd-mini-btn {
+  font-size: var(--font-ui-smaller);
+  padding: 2px 10px;
+  height: auto;
+  cursor: pointer;
+}
+
+.yd-review-list {
+  max-height: 380px;
+  overflow-y: auto;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  background-color: var(--background-primary-alt);
+  margin-bottom: 18px;
+}
+
+.yd-review-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--background-modifier-border);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.yd-review-item:last-child {
+  border-bottom: none;
+}
+
+.yd-review-item:hover {
+  background-color: var(--background-modifier-hover);
+}
+
+.yd-review-item input[type='checkbox'] {
+  cursor: pointer;
+  margin: 0;
+  width: 16px;
+  height: 16px;
+}
+
+.yd-action-badge {
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.yd-item-details {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  gap: 2px;
+  flex: 1;
+}
+
+.yd-item-path {
+  font-size: var(--font-ui-small);
+  font-weight: 500;
+  color: var(--text-normal);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.yd-item-reason {
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+}
+
+.yd-review-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+/* =========================================================================
+   Live Sync Progress HUD Notice
+   ========================================================================= */
+
+.yd-progress-notice-root {
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.yd-progress-notice-card {
+  background-color: var(--background-secondary-alt, #1e1e2e);
+  border: 1px solid var(--interactive-accent, #6366f1);
+  border-radius: 8px;
+  padding: 12px 14px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+  min-width: 280px;
+  max-width: 360px;
+  font-family: var(--font-interface);
+}
+
+.yd-progress-top-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.yd-progress-icon {
+  font-size: 16px;
+  color: var(--interactive-accent, #6366f1);
+}
+
+.yd-progress-title {
+  font-size: var(--font-ui-small);
+  font-weight: 600;
+  color: var(--text-normal);
+  flex: 1;
+}
+
+.yd-progress-pct {
+  font-size: var(--font-ui-small);
+  font-weight: 700;
+  color: var(--interactive-accent, #6366f1);
+  font-variant-numeric: tabular-nums;
+}
+
+.yd-progress-track {
+  width: 100%;
+  height: 6px;
+  background-color: var(--background-modifier-border, rgba(255, 255, 255, 0.1));
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.yd-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--interactive-accent, #6366f1), #818cf8);
+  border-radius: 3px;
+  transition: width 0.25s ease-out;
+}
+
+.yd-progress-fill.yd-progress-indeterminate {
+  animation: yd-indeterminate-bar 1.2s infinite ease-in-out;
+}
+
+@keyframes yd-indeterminate-bar {
+  0% { transform: translateX(-100%); }
+  50% { transform: translateX(100%); }
+  100% { transform: translateX(300%); }
+}
+
+.yd-progress-fill.yd-progress-success {
+  background: var(--text-success, #4ade80) !important;
+}
+
+.yd-progress-fill.yd-progress-error {
+  background: var(--text-error, #f87171) !important;
+}
+
+.yd-progress-bottom-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.yd-progress-file {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+
+.yd-progress-count {
+  font-weight: 600;
+  margin-left: 8px;
+  white-space: nowrap;
+}

@@ -1,0 +1,35 @@
+{
+  "name": "obsidian-yandex-disk-sync",
+  "version": "1.0.0",
+  "description": "Bidirectional synchronization between Windows and Android using official Yandex Disk REST API with zero data loss and client-side E2EE.",
+  "main": "main.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node esbuild.config.mjs",
+    "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+    "typecheck": "tsc -noEmit -skipLibCheck",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "vitest run tests/e2e"
+  },
+  "keywords": [
+    "obsidian",
+    "obsidian-plugin",
+    "sync",
+    "yandex-disk",
+    "cloud-storage",
+    "e2ee",
+    "cross-platform"
+  ],
+  "author": "Yandex Disk Sync Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.14.12",
+    "@vitest/coverage-v8": "^2.1.1",
+    "esbuild": "^0.23.1",
+    "obsidian": "latest",
+    "typescript": "^5.5.4",
+    "vitest": "^2.1.1"
+  }
+}
