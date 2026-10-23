@@ -124,7 +124,7 @@ export class SyncProgressNotice {
     for (let i = 0; i < text.length; i++) {
       const char = text[i];
       if (char === ' ') {
-        this.titleEl.createSpan({ cls: 'yd-wave-letter-space', text: '\u00A0' });
+        this.titleEl.createSpan({ cls: 'yd-wave-letter-space', text: ' ' });
       } else {
         const span = this.titleEl.createSpan({ cls: 'yd-wave-letter', text: char });
         const delay = (i * 0.08).toFixed(2);
@@ -132,11 +132,6 @@ export class SyncProgressNotice {
           (span.style as any).animationDelay = `${delay}s`;
         }
       }
-    }
-
-    // Ensure mock test element has textContent set for assertions
-    if (!this.titleEl.textContent && Array.isArray((this.titleEl as any).children)) {
-      this.titleEl.textContent = text;
     }
   }
 
@@ -164,28 +159,47 @@ export class SyncProgressNotice {
       return;
     }
 
+    if (
+      status.state === 'uploading' ||
+      status.state === 'downloading' ||
+      status.state === 'deleting'
+    ) {
+      this.setTitle('Синхронизация...', true);
+      const cleanMsg = status.message.replace(/^Processing\s+/i, '');
+      this.detailEl?.setText(cleanMsg);
+
+      if (status.progressTotal && status.progressTotal > 0) {
+        const current = status.progressCurrent ?? 0;
+        const total = status.progressTotal;
+        const pct = Math.min(100, Math.round((current / total) * 100));
+
+        this.pctEl?.setText(`${pct}%`);
+        if (this.barFillEl) {
+          this.barFillEl.style.width = `${pct}%`;
+          if (typeof this.barFillEl.removeClass === 'function') {
+            this.barFillEl.removeClass('yd-progress-indeterminate');
+          }
+        }
+        this.countEl?.setText(`${current} / ${total}`);
+      } else {
+        this.pctEl?.setText('');
+        if (this.barFillEl) {
+          this.barFillEl.style.width = '30%';
+          if (typeof this.barFillEl.addClass === 'function') {
+            this.barFillEl.addClass('yd-progress-indeterminate');
+          }
+        }
+        this.countEl?.setText('');
+      }
+      return;
+    }
+
+    // Generic fallback for any other state (idle awaiting review, error, etc.)
     if (this.barFillEl && typeof this.barFillEl.removeClass === 'function') {
       this.barFillEl.removeClass('yd-progress-indeterminate');
     }
-
-    if (
-      (status.state === 'uploading' || status.state === 'downloading' || status.state === 'deleting') &&
-      status.progressTotal &&
-      status.progressTotal > 0
-    ) {
-      const current = status.progressCurrent ?? 0;
-      const total = status.progressTotal;
-      const pct = Math.min(100, Math.round((current / total) * 100));
-
-      this.setTitle('Синхронизация...', true);
-      this.pctEl?.setText(`${pct}%`);
-      if (this.barFillEl) {
-        this.barFillEl.style.width = `${pct}%`;
-      }
-      const cleanMsg = status.message.replace(/^Processing\s+/i, '');
-      this.detailEl?.setText(cleanMsg);
-      this.countEl?.setText(`${current} / ${total}`);
-    }
+    this.setTitle(status.state === 'error' ? 'Ошибка' : 'Синхронизация...', true);
+    this.detailEl?.setText(status.message);
   }
 
   public finish(success: boolean, summaryText: string): void {
@@ -198,7 +212,7 @@ export class SyncProgressNotice {
       if (this.containerEl && typeof this.containerEl.addClass === 'function') {
         this.containerEl.addClass('yd-gemini-success', 'yd-sync-finished');
       }
-      this.setTitle('Синхронизация завершена', false);
+      this.setTitle('Синхронизация завершена', true);
       this.pctEl?.setText('100%');
       if (this.barFillEl) {
         this.barFillEl.style.width = '100%';
@@ -212,7 +226,7 @@ export class SyncProgressNotice {
       if (this.containerEl && typeof this.containerEl.addClass === 'function') {
         this.containerEl.addClass('yd-gemini-error', 'yd-sync-finished');
       }
-      this.setTitle('Синхронизация остановлена', false);
+      this.setTitle('Синхронизация остановлена', true);
       if (this.barFillEl && typeof this.barFillEl.addClass === 'function') {
         this.barFillEl.addClass('yd-progress-error');
       }

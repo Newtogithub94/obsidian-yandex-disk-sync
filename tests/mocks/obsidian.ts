@@ -82,11 +82,20 @@ export function createMockElement(tag: string = 'div'): any {
     tagName: tag.toUpperCase(),
     children: [] as any[],
     classList: new Set<string>(),
-    textContent: '',
+    _textContent: '',
+    get textContent(): string {
+      if (this.children.length > 0) {
+        return this.children.map((c: any) => c.textContent ?? '').join('');
+      }
+      return this._textContent ?? '';
+    },
+    set textContent(val: string) {
+      this._textContent = val ?? '';
+    },
     style: {},
     empty() {
       this.children = [];
-      this.textContent = '';
+      this._textContent = '';
     },
     createEl(t: string, opts?: any) {
       const child = createMockElement(t);
@@ -102,6 +111,7 @@ export function createMockElement(tag: string = 'div'): any {
       return this.createEl('span', opts);
     },
     setText(text: string) {
+      this.children = [];
       this.textContent = text;
     },
     addClass(...classes: string[]) {

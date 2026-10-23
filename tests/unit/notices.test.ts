@@ -117,6 +117,9 @@ describe('Sync UI Notices & Progress HUD Suite', () => {
       expect(card.hasClass('yd-gemini-success')).toBe(true);
       expect(card.hasClass('yd-sync-finished')).toBe(true);
       expect(titleEl.textContent).toBe('Синхронизация завершена');
+      // Letter spans are preserved so CSS calm transition smoothly docks them
+      const letterSpans = titleEl.children.filter((c: any) => c.hasClass('yd-wave-letter'));
+      expect(letterSpans.length).toBeGreaterThan(0);
       expect(pctEl.textContent).toBe('100%');
       expect(barFillEl.style.width).toBe('100%');
       expect(barFillEl.hasClass('yd-progress-success')).toBe(true);
@@ -137,6 +140,37 @@ describe('Sync UI Notices & Progress HUD Suite', () => {
       expect(titleEl.textContent).toBe('Синхронизация остановлена');
       expect(barFillEl.hasClass('yd-progress-error')).toBe(true);
       expect(detailEl.textContent).toBe('Сетевая ошибка');
+    });
+
+    it('handles indeterminate uploading state when progressTotal is undefined or 0', () => {
+      const titleEl = (progressNotice as any).titleEl;
+      const detailEl = (progressNotice as any).detailEl;
+      const barFillEl = (progressNotice as any).barFillEl;
+      const pctEl = (progressNotice as any).pctEl;
+
+      progressNotice.update({
+        state: 'uploading',
+        message: 'Connecting to storage...',
+      });
+
+      expect(titleEl.textContent).toBe('Синхронизация...');
+      expect(detailEl.textContent).toBe('Connecting to storage...');
+      expect(pctEl.textContent).toBe('');
+      expect(barFillEl.hasClass('yd-progress-indeterminate')).toBe(true);
+      expect(barFillEl.style.width).toBe('30%');
+    });
+
+    it('handles idle waiting for review status state gracefully', () => {
+      const titleEl = (progressNotice as any).titleEl;
+      const detailEl = (progressNotice as any).detailEl;
+
+      progressNotice.update({
+        state: 'idle',
+        message: 'Ожидание подтверждения действий...',
+      });
+
+      expect(titleEl.textContent).toBe('Синхронизация...');
+      expect(detailEl.textContent).toBe('Ожидание подтверждения действий...');
     });
 
     it('does not re-render DOM spans when title text and waving state remain identical', () => {
