@@ -526,21 +526,23 @@
   box-sizing: border-box;
 }
 
-/* Gemini iridescent glowing animated border */
+/* Gemini iridescent glowing animated border with purple wave resonance */
 .yd-progress-notice-card.yd-gemini-border {
   background: linear-gradient(
     135deg,
     #1d4ed8 0%,
-    #00d2ff 22%,
-    #7c3aed 48%,
-    #ec4899 74%,
+    #00d2ff 20%,
+    #9333ea 42%,
+    #c084fc 60%,
+    #ec4899 78%,
     #1d4ed8 100%
   );
   background-size: 300% 300%;
   animation: yd-gemini-shimmer-flow 3.5s ease infinite;
   box-shadow: 
-    0 0 18px rgba(124, 58, 237, 0.4),
-    0 0 32px rgba(0, 210, 255, 0.22),
+    0 0 20px rgba(192, 132, 252, 0.42),
+    0 0 36px rgba(147, 51, 234, 0.28),
+    0 0 45px rgba(0, 210, 255, 0.2),
     0 8px 32px rgba(0, 0, 0, 0.5);
 }
 
@@ -562,12 +564,179 @@
     0 8px 32px rgba(0, 0, 0, 0.5) !important;
 }
 
-/* Inner card body with theme background */
+/* Inner card body with theme background & liquid wave containment */
 .yd-progress-card-inner {
+  position: relative;
+  overflow: hidden;
   background-color: var(--background-secondary, var(--background-primary, #181825));
   border-radius: 12px;
   padding: 12px 14px;
   box-sizing: border-box;
+}
+
+/* =========================================================================
+   Light-Purple Ethereal Waves & Caustics Backdrop (GPU Composited)
+   ========================================================================= */
+
+.yd-progress-waves-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 1;
+  transition: opacity 0.7s ease;
+}
+
+/* Ambient pulsing light-purple caustic glow */
+.yd-wave-ambient-glow {
+  position: absolute;
+  inset: -15%;
+  background: 
+    radial-gradient(circle at 30% 25%, rgba(192, 132, 252, 0.22) 0%, transparent 55%),
+    radial-gradient(circle at 75% 75%, rgba(216, 180, 254, 0.25) 0%, transparent 60%),
+    radial-gradient(circle at 50% 100%, rgba(168, 85, 247, 0.16) 0%, transparent 50%);
+  filter: blur(8px);
+  animation: yd-ambient-glow-pulse 4.8s ease-in-out infinite alternate;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+@keyframes yd-ambient-glow-pulse {
+  0% {
+    transform: scale(0.96) rotate(0deg);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.06) rotate(1.5deg);
+    opacity: 0.95;
+  }
+  100% {
+    transform: scale(1.0) rotate(-1deg);
+    opacity: 0.7;
+  }
+}
+
+/* Base wave layer layout */
+.yd-wave-layer {
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 200%;
+  height: 90%;
+  background-repeat: repeat-x;
+  background-position: left bottom;
+  background-size: 50% 100%;
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* 1. Back wave: Deeper lilac tone, steady majestic rolling cycle */
+.yd-wave-layer-back {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 100' preserveAspectRatio='none'%3E%3Cpath d='M 0,35 C 150,10 150,60 300,35 C 450,10 450,60 600,35 C 750,10 750,60 900,35 C 1050,10 1050,60 1200,35 L 1200,100 L 0,100 Z' fill='rgba(192, 132, 252, 0.18)'/%3E%3C/svg%3E");
+  animation: yd-wave-flow-back 7.2s linear infinite;
+  opacity: 0.85;
+}
+
+@keyframes yd-wave-flow-back {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(-25%, -3.5px, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+/* 2. Mid wave: Soft translucent violet, counter-harmonic cycle */
+.yd-wave-layer-mid {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 100' preserveAspectRatio='none'%3E%3Cpath d='M 0,25 C 125,50 125,5 250,25 C 375,45 375,5 500,25 C 625,50 625,5 750,25 C 875,45 875,5 1000,25 L 1000,100 L 0,100 Z' fill='rgba(216, 180, 254, 0.22)'/%3E%3C/svg%3E");
+  animation: yd-wave-flow-mid 5.1s linear infinite;
+  opacity: 0.9;
+}
+
+@keyframes yd-wave-flow-mid {
+  0% {
+    transform: translate3d(0, -2px, 0);
+  }
+  50% {
+    transform: translate3d(-25%, 3px, 0);
+  }
+  100% {
+    transform: translate3d(-50%, -2px, 0);
+  }
+}
+
+/* 3. Front wave: Ethereal crest with delicate light highlight contour line */
+.yd-wave-layer-front {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 100' preserveAspectRatio='none'%3E%3Cpath d='M 0,20 C 100,8 100,32 200,20 C 300,8 300,32 400,20 C 500,8 500,32 600,20 C 700,8 700,32 800,20 L 800,100 L 0,100 Z' fill='rgba(233, 213, 255, 0.16)' stroke='rgba(245, 208, 254, 0.45)' stroke-width='1.5'/%3E%3C/svg%3E");
+  animation: yd-wave-flow-front 3.8s linear infinite;
+  opacity: 0.95;
+}
+
+@keyframes yd-wave-flow-front {
+  0% {
+    transform: translate3d(0, 1.5px, 0);
+  }
+  50% {
+    transform: translate3d(-25%, -2.5px, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 1.5px, 0);
+  }
+}
+
+/* Caustic water shimmer glow */
+.yd-wave-caustic-shimmer {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(216, 180, 254, 0.18) 0%,
+    rgba(192, 132, 252, 0.10) 35%,
+    transparent 70%
+  );
+  filter: blur(6px);
+  animation: yd-caustic-rotate 6.5s ease-in-out infinite alternate;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+@keyframes yd-caustic-rotate {
+  0% {
+    transform: translate3d(-8%, -8%, 0) rotate(0deg) scale(0.92);
+    opacity: 0.45;
+  }
+  50% {
+    transform: translate3d(8%, 6%, 0) rotate(5deg) scale(1.08);
+    opacity: 0.85;
+  }
+  100% {
+    transform: translate3d(-4%, 8%, 0) rotate(-3deg) scale(1.0);
+    opacity: 0.55;
+  }
+}
+
+/* =========================================================================
+   Content Rows & Harmonic Waving Letters (Sitting Crisp Above Waves)
+   ========================================================================= */
+
+.yd-progress-top-row,
+.yd-progress-track,
+.yd-progress-bottom-row {
+  position: relative;
+  z-index: 1;
 }
 
 .yd-progress-top-row {
@@ -577,6 +746,7 @@
   margin-bottom: 8px;
 }
 
+/* Subtle organic buoyancy on Icon */
 .yd-progress-icon {
   font-size: 16px;
   background: linear-gradient(135deg, #38bdf8, #c084fc);
@@ -584,6 +754,20 @@
   -webkit-text-fill-color: transparent;
   filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.7));
   display: inline-block;
+  will-change: transform;
+  animation: yd-icon-wave-float 2.6s ease-in-out infinite;
+}
+
+@keyframes yd-icon-wave-float {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+  30% {
+    transform: translate3d(0, -2px, 0) rotate(-4deg) scale(1.06);
+  }
+  70% {
+    transform: translate3d(0, 1.2px, 0) rotate(3deg) scale(0.96);
+  }
 }
 
 .yd-progress-title {
@@ -591,14 +775,68 @@
   font-weight: 600;
   color: var(--text-normal);
   flex: 1;
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
+/* Harmonic wave-floating letters */
+.yd-wave-letter {
+  display: inline-block;
+  will-change: transform;
+  animation: yd-letter-wave-motion 2.6s ease-in-out infinite;
+}
+
+.yd-wave-letter-space {
+  display: inline-block;
+  width: 0.32em;
+}
+
+@keyframes yd-letter-wave-motion {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate3d(0, -1.8px, 0) rotate(-0.6deg);
+  }
+  50% {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  75% {
+    transform: translate3d(0, 1.4px, 0) rotate(0.5deg);
+  }
+}
+
+.theme-dark .yd-wave-letter {
+  text-shadow: 0 0 8px rgba(192, 132, 252, 0.35);
+}
+
+.theme-light .yd-wave-letter {
+  text-shadow: 0 0 6px rgba(147, 51, 234, 0.22);
+}
+
+/* Percentage with gentle wave bob */
 .yd-progress-pct {
   font-size: var(--font-ui-small);
   font-weight: 700;
   color: #38bdf8;
   font-variant-numeric: tabular-nums;
   text-shadow: 0 0 10px rgba(56, 189, 248, 0.55);
+  display: inline-block;
+  will-change: transform;
+  animation: yd-pct-wave-bob 2.6s ease-in-out infinite 0.32s;
+}
+
+@keyframes yd-pct-wave-bob {
+  0%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  35% {
+    transform: translate3d(0, -1.8px, 0);
+  }
+  75% {
+    transform: translate3d(0, 1.2px, 0);
+  }
 }
 
 .yd-progress-track {
@@ -648,11 +886,27 @@
   color: var(--text-muted);
 }
 
+.yd-progress-detail,
 .yd-progress-file {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 220px;
+  display: inline-block;
+  will-change: transform;
+  animation: yd-detail-wave-drift 3.6s ease-in-out infinite 0.5s;
+}
+
+@keyframes yd-detail-wave-drift {
+  0%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  40% {
+    transform: translate3d(1px, -1px, 0);
+  }
+  80% {
+    transform: translate3d(-0.8px, 0.8px, 0);
+  }
 }
 
 .yd-progress-count {
@@ -661,27 +915,72 @@
   white-space: nowrap;
 }
 
+/* =========================================================================
+   Completion State: Calm waves, dock letters smoothly
+   ========================================================================= */
+
+.yd-progress-notice-card.yd-sync-finished .yd-progress-waves-container,
+.yd-progress-notice-card.yd-gemini-success .yd-progress-waves-container,
+.yd-progress-notice-card.yd-gemini-error .yd-progress-waves-container {
+  opacity: 0;
+}
+
+.yd-progress-notice-card.yd-sync-finished .yd-wave-letter,
+.yd-progress-notice-card.yd-gemini-success .yd-wave-letter,
+.yd-progress-notice-card.yd-gemini-error .yd-wave-letter,
+.yd-progress-notice-card.yd-sync-finished .yd-progress-icon,
+.yd-progress-notice-card.yd-gemini-success .yd-progress-icon,
+.yd-progress-notice-card.yd-gemini-error .yd-progress-icon,
+.yd-progress-notice-card.yd-sync-finished .yd-progress-pct,
+.yd-progress-notice-card.yd-gemini-success .yd-progress-pct,
+.yd-progress-notice-card.yd-gemini-error .yd-progress-pct,
+.yd-progress-notice-card.yd-sync-finished .yd-progress-detail,
+.yd-progress-notice-card.yd-gemini-success .yd-progress-detail,
+.yd-progress-notice-card.yd-gemini-error .yd-progress-detail {
+  animation: none !important;
+  transform: none !important;
+  text-shadow: none !important;
+}
+
+/* Accessibility: Respect system motion reduction preferences */
+@media (prefers-reduced-motion: reduce) {
+  .yd-progress-waves-container,
+  .yd-wave-layer,
+  .yd-wave-ambient-glow,
+  .yd-wave-caustic-shimmer,
+  .yd-wave-letter,
+  .yd-progress-icon,
+  .yd-progress-pct,
+  .yd-progress-detail,
+  .yd-progress-fill {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+
 /* Shimmer flow keyframes */
 @keyframes yd-gemini-shimmer-flow {
   0% {
     background-position: 0% 50%;
     box-shadow: 
-      0 0 18px rgba(124, 58, 237, 0.4),
-      0 0 32px rgba(0, 210, 255, 0.22),
+      0 0 20px rgba(192, 132, 252, 0.42),
+      0 0 36px rgba(147, 51, 234, 0.28),
+      0 0 45px rgba(0, 210, 255, 0.2),
       0 8px 32px rgba(0, 0, 0, 0.5);
   }
   50% {
     background-position: 100% 50%;
     box-shadow: 
       0 0 24px rgba(236, 72, 153, 0.45),
-      0 0 38px rgba(147, 51, 234, 0.3),
+      0 0 40px rgba(192, 132, 252, 0.35),
       0 8px 32px rgba(0, 0, 0, 0.5);
   }
   100% {
     background-position: 0% 50%;
     box-shadow: 
-      0 0 18px rgba(124, 58, 237, 0.4),
-      0 0 32px rgba(0, 210, 255, 0.22),
+      0 0 20px rgba(192, 132, 252, 0.42),
+      0 0 36px rgba(147, 51, 234, 0.28),
+      0 0 45px rgba(0, 210, 255, 0.2),
       0 8px 32px rgba(0, 0, 0, 0.5);
   }
 }

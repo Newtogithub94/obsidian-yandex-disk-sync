@@ -106,12 +106,20 @@ export function createMockElement(tag: string = 'div'): any {
     },
     addClass(...classes: string[]) {
       for (const c of classes) {
-        if (c) this.classList.add(c);
+        if (c) {
+          for (const part of c.split(/\s+/)) {
+            if (part) this.classList.add(part);
+          }
+        }
       }
     },
     removeClass(...classes: string[]) {
       for (const c of classes) {
-        if (c) this.classList.delete(c);
+        if (c) {
+          for (const part of c.split(/\s+/)) {
+            if (part) this.classList.delete(part);
+          }
+        }
       }
     },
     hasClass(c: string) {

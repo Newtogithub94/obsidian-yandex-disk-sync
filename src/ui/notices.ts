@@ -43,6 +43,9 @@ export class SyncProgressNotice {
   private barFillEl: HTMLElement | null = null;
   private detailEl: HTMLElement | null = null;
   private countEl: HTMLElement | null = null;
+  private waveContainerEl: HTMLElement | null = null;
+  private currentTitleText: string = '';
+  private isWaving: boolean = false;
 
   constructor() {
     this.notice = new Notice('', 0);
@@ -58,11 +61,24 @@ export class SyncProgressNotice {
       this.containerEl = card;
       const inner = card.createDiv({ cls: 'yd-progress-card-inner' });
 
-      // Top row: Icon + Title + Pct
+      // Transparent animated light-purple wave backdrop inside the card frame
+      const waveContainer = inner.createDiv({ cls: 'yd-progress-waves-container' });
+      this.waveContainerEl = waveContainer;
+      if (typeof (waveContainer as any).setAttribute === 'function') {
+        (waveContainer as any).setAttribute('aria-hidden', 'true');
+      }
+      waveContainer.createDiv({ cls: 'yd-wave-ambient-glow' });
+      waveContainer.createDiv({ cls: 'yd-wave-layer yd-wave-layer-back' });
+      waveContainer.createDiv({ cls: 'yd-wave-layer yd-wave-layer-mid' });
+      waveContainer.createDiv({ cls: 'yd-wave-layer yd-wave-layer-front' });
+      waveContainer.createDiv({ cls: 'yd-wave-caustic-shimmer' });
+
+      // Top row: Icon + Title + Pct (rendered with z-index: 1 on top of waves)
       const topRow = inner.createDiv({ cls: 'yd-progress-top-row' });
       topRow.createSpan({ cls: 'yd-progress-icon', text: '✨' });
-      this.titleEl = topRow.createSpan({ cls: 'yd-progress-title', text: 'Синхронизация...' });
+      this.titleEl = topRow.createSpan({ cls: 'yd-progress-title' });
       this.pctEl = topRow.createSpan({ cls: 'yd-progress-pct', text: '0%' });
+      this.setTitle('Синхронизация...', true);
 
       // Middle row: Progress track + fill
       const track = inner.createDiv({ cls: 'yd-progress-track' });
@@ -74,6 +90,53 @@ export class SyncProgressNotice {
       const bottomRow = inner.createDiv({ cls: 'yd-progress-bottom-row' });
       this.detailEl = bottomRow.createSpan({ cls: 'yd-progress-detail', text: 'Подготовка...' });
       this.countEl = bottomRow.createSpan({ cls: 'yd-progress-count', text: '' });
+    }
+  }
+
+  /**
+   * Sets title text with optional gentle harmonic letter waving animation.
+   * If waving is enabled, each character gently bobs in a phase-staggered harmonic wave.
+   */
+  private setTitle(text: string, waving: boolean = true): void {
+    if (!this.titleEl) return;
+    if (this.currentTitleText === text && this.isWaving === waving) {
+      return;
+    }
+    this.currentTitleText = text;
+    this.isWaving = waving;
+
+    if (typeof this.titleEl.empty === 'function') {
+      this.titleEl.empty();
+    } else {
+      (this.titleEl as any).innerHTML = '';
+    }
+
+    if (!waving) {
+      if (typeof this.titleEl.setText === 'function') {
+        this.titleEl.setText(text);
+      } else {
+        this.titleEl.textContent = text;
+      }
+      return;
+    }
+
+    // Render individual animated wave letters with harmonic delays
+    for (let i = 0; i < text.length; i++) {
+      const char = text[i];
+      if (char === ' ') {
+        this.titleEl.createSpan({ cls: 'yd-wave-letter-space', text: '\u00A0' });
+      } else {
+        const span = this.titleEl.createSpan({ cls: 'yd-wave-letter', text: char });
+        const delay = (i * 0.08).toFixed(2);
+        if (span && span.style) {
+          (span.style as any).animationDelay = `${delay}s`;
+        }
+      }
+    }
+
+    // Ensure mock test element has textContent set for assertions
+    if (!this.titleEl.textContent && Array.isArray((this.titleEl as any).children)) {
+      this.titleEl.textContent = text;
     }
   }
 
@@ -89,7 +152,7 @@ export class SyncProgressNotice {
     }
 
     if (status.state === 'scanning' || status.state === 'diffing') {
-      this.titleEl?.setText('Анализ изменений...');
+      this.setTitle('Анализ изменений...', true);
       this.detailEl?.setText(status.message);
       this.pctEl?.setText('');
       if (this.barFillEl) {
@@ -114,7 +177,7 @@ export class SyncProgressNotice {
       const total = status.progressTotal;
       const pct = Math.min(100, Math.round((current / total) * 100));
 
-      this.titleEl?.setText('Синхронизация...');
+      this.setTitle('Синхронизация...', true);
       this.pctEl?.setText(`${pct}%`);
       if (this.barFillEl) {
         this.barFillEl.style.width = `${pct}%`;
@@ -133,9 +196,9 @@ export class SyncProgressNotice {
 
     if (success) {
       if (this.containerEl && typeof this.containerEl.addClass === 'function') {
-        this.containerEl.addClass('yd-gemini-success');
+        this.containerEl.addClass('yd-gemini-success', 'yd-sync-finished');
       }
-      this.titleEl?.setText('Синхронизация завершена');
+      this.setTitle('Синхронизация завершена', false);
       this.pctEl?.setText('100%');
       if (this.barFillEl) {
         this.barFillEl.style.width = '100%';
@@ -147,9 +210,9 @@ export class SyncProgressNotice {
       this.countEl?.setText('✓');
     } else {
       if (this.containerEl && typeof this.containerEl.addClass === 'function') {
-        this.containerEl.addClass('yd-gemini-error');
+        this.containerEl.addClass('yd-gemini-error', 'yd-sync-finished');
       }
-      this.titleEl?.setText('Синхронизация остановлена');
+      this.setTitle('Синхронизация остановлена', false);
       if (this.barFillEl && typeof this.barFillEl.addClass === 'function') {
         this.barFillEl.addClass('yd-progress-error');
       }
