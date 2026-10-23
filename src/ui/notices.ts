@@ -54,23 +54,24 @@ export class SyncProgressNotice {
         root.addClass('yd-progress-notice-root');
       }
 
-      const container = root.createDiv({ cls: 'yd-progress-notice-card' });
-      this.containerEl = container;
+      const card = root.createDiv({ cls: 'yd-progress-notice-card yd-gemini-border' });
+      this.containerEl = card;
+      const inner = card.createDiv({ cls: 'yd-progress-card-inner' });
 
       // Top row: Icon + Title + Pct
-      const topRow = container.createDiv({ cls: 'yd-progress-top-row' });
-      topRow.createSpan({ cls: 'yd-progress-icon', text: '⚡' });
+      const topRow = inner.createDiv({ cls: 'yd-progress-top-row' });
+      topRow.createSpan({ cls: 'yd-progress-icon', text: '✨' });
       this.titleEl = topRow.createSpan({ cls: 'yd-progress-title', text: 'Синхронизация...' });
       this.pctEl = topRow.createSpan({ cls: 'yd-progress-pct', text: '0%' });
 
       // Middle row: Progress track + fill
-      const track = container.createDiv({ cls: 'yd-progress-track' });
+      const track = inner.createDiv({ cls: 'yd-progress-track' });
       const fill = track.createDiv({ cls: 'yd-progress-fill' });
       this.barFillEl = fill;
       fill.style.width = '0%';
 
       // Bottom row: Detail (current file) + Count (X / Y)
-      const bottomRow = container.createDiv({ cls: 'yd-progress-bottom-row' });
+      const bottomRow = inner.createDiv({ cls: 'yd-progress-bottom-row' });
       this.detailEl = bottomRow.createSpan({ cls: 'yd-progress-detail', text: 'Подготовка...' });
       this.countEl = bottomRow.createSpan({ cls: 'yd-progress-count', text: '' });
     }
@@ -131,6 +132,9 @@ export class SyncProgressNotice {
     }
 
     if (success) {
+      if (this.containerEl && typeof this.containerEl.addClass === 'function') {
+        this.containerEl.addClass('yd-gemini-success');
+      }
       this.titleEl?.setText('Синхронизация завершена');
       this.pctEl?.setText('100%');
       if (this.barFillEl) {
@@ -142,6 +146,9 @@ export class SyncProgressNotice {
       this.detailEl?.setText(summaryText);
       this.countEl?.setText('✓');
     } else {
+      if (this.containerEl && typeof this.containerEl.addClass === 'function') {
+        this.containerEl.addClass('yd-gemini-error');
+      }
       this.titleEl?.setText('Синхронизация остановлена');
       if (this.barFillEl && typeof this.barFillEl.addClass === 'function') {
         this.barFillEl.addClass('yd-progress-error');
